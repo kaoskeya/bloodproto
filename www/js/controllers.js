@@ -47,22 +47,40 @@ angular.module('starter.controllers', [])
 .controller('PlaylistCtrl', function($scope, $stateParams) {
 })
 
-.controller('BrowseCtrl', function($scope, $stateParams) {
+.controller('BrowseCtrl', function($scope, $stateParams, $http) {
+
+  $scope.locationData = 'fetching data';
+  $scope.addressData = 'fetching address';
 
   var onSuccess = function(position) {
-    alert('Latitude: '          + position.coords.latitude          + '\n' +
-      'Longitude: '         + position.coords.longitude         + '\n' +
-      'Altitude: '          + position.coords.altitude          + '\n' +
-      'Accuracy: '          + position.coords.accuracy          + '\n' +
-      'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-      'Heading: '           + position.coords.heading           + '\n' +
-      'Speed: '             + position.coords.speed             + '\n' +
-      'Timestamp: '         + position.timestamp                + '\n');
+    $scope.locationData = 'Latitude: '          + position.coords.latitude          + '<br />' +
+      'Longitude: '         + position.coords.longitude         + '<br />' +
+      'Altitude: '          + position.coords.altitude          + '<br />' +
+      'Accuracy: '          + position.coords.accuracy          + '<br />' +
+      'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '<br />' +
+      'Heading: '           + position.coords.heading           + '<br />' +
+      'Speed: '             + position.coords.speed             + '<br />' +
+      'Timestamp: '         + position.timestamp                + '<br />';
+
+
+      $http
+      .get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + position.coords.latitude + ',' + position.coords.longitude + '&key=AIzaSyBkPgH6E7caKkL6DwxLv_yKJygOihwOOB4')
+      .success(function(data){
+        console.log(data.results);
+        $scope.addressData = data.results[0].address_components;
+      })
+      .error(function(err){
+        alert('There was an error');
+        alert(err);
+      })
+
   };
 
+
+
   function onError(error) {
-    alert('code: '    + error.code    + '\n' +
-      'message: ' + error.message + '\n');
+    alert('code: '    + error.code    + '<br />' +
+      'message: ' + error.message + '<br />');
   }
 
   navigator.geolocation.getCurrentPosition(onSuccess, onError);
